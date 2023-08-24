@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Kennisgraaf.net</title>
+        <style>
+         @font-face {
+             font-family: "Montserrat";
+             font-style: normal;
+             font-weight: 400;
+             src:
+                 local(''),
+                 url("fonts/montserrat-v25-latin-regular.woff2") format("woff2"),
+                 url("fonts/montserrat-v25-latin-regular.woff") format("woff");
+         }
+         @font-face {
+             font-family: "Josefin Slab";
+             font-style: normal;
+             font-weight: 400;
+             src:
+                 local(''),
+                 url("fonts/josefin-slab-v20-latin-regular.woff2") format("woff2"),
+                 url("fonts/josefin-slab-v20-latin-regular.woff") format("woff");
+         }
+         body {
+             margin: 0;
+             font-family: "Montserrat";
+         }
+        </style>
+        <script src="main.js"></script>
+        <script>
+         window.addEventListener('load', function() {
+             var main = Elm.Main.init({
+                 flags: {
+                     protocol: window.location.protocol,
+                     hostname: window.location.hostname,
+                     hostport: window.location.port
+                    }
+                 });
+         });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
