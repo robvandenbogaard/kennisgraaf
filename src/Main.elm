@@ -24,13 +24,17 @@ import Knowledge.Graph
 import Style
 
 
-type Model
+type alias Model =
+    { lines : List String
+    , selected : Maybe String
+    , graph : Knowledge.Graph.Model
+    , mode : Mode
+    }
+
+
+type Mode
     = Import { input : String }
     | Browse
-        { lines : List String
-        , selected : Maybe String
-        , graph : Knowledge.Graph.Model
-        }
 
 
 main =
@@ -66,11 +70,11 @@ Markdown
     is ook een codesuperkracht
 """
     in
-    ( Browse
-        { graph = Knowledge.Graph.init example
-        , lines = String.lines example
-        , selected = Nothing
-        }
+    ( { graph = Knowledge.Graph.init example
+      , lines = String.lines example
+      , selected = Nothing
+      , mode = Browse
+      }
     , Cmd.none
     )
 
@@ -80,23 +84,23 @@ view model =
     { title = "Kennisgraaf"
     , body =
         [ main_ (Style.withFont ++ Style.screen)
-            (case model of
-                Import _ ->
+            (case model.mode of
+                Import { input } ->
                     [ section (Style.pile ++ Style.panel)
-                        [ textarea (onInput Input :: Style.panel ++ Style.input) []
+                        [ textarea (onInput Input :: Style.panel ++ Style.input) [ text input ]
                         , nav []
                             [ button (onClick Update :: Style.button ++ Style.withFont) [ text "Maak de kennisgraaf" ] ]
                         ]
                     ]
 
-                Browse { graph, lines, selected } ->
+                Browse ->
                     [ section (Style.pile ++ Style.panel)
-                        [ lines
+                        [ model.lines
                             |> List.map
                                 (\l ->
                                     li
                                         (onClick (Selected l)
-                                            :: (if Just l == selected then
+                                            :: (if Just l == model.selected then
                                                     [ style "background" "antiquewhite" ]
 
                                                 else
@@ -113,7 +117,7 @@ view model =
                         ]
                     , article (style "overflow" "scroll" :: Style.output)
                         [ pre []
-                            [ lazy Knowledge.Graph.view graph
+                            [ lazy Knowledge.Graph.view model.graph
                                 |> Html.map GraphMsg
                             ]
                         ]
@@ -132,40 +136,41 @@ type Msg
 
 
 update msg model =
-    case model of
+    case model.mode of
         Import { input } ->
             case msg of
                 Input text ->
-                    ( Import { input = text }, Cmd.none )
+                    ( { model | mode = Import { input = text } }, Cmd.none )
 
                 Update ->
                     if String.isEmpty input then
                         init ()
 
                     else
-                        ( Browse
-                            { graph = Knowledge.Graph.init input
+                        ( { model
+                            | graph = Knowledge.Graph.init input
                             , lines = String.lines input
                             , selected = Nothing
-                            }
+                            , mode = Browse
+                          }
                         , Cmd.none
                         )
 
                 _ ->
                     ( model, Cmd.none )
 
-        Browse { graph, lines, selected } ->
+        Browse ->
             case msg of
                 New ->
-                    ( Import { input = "" }, Cmd.none )
+                    ( { model | mode = Import { input = String.join "\n" model.lines } }, Cmd.none )
 
                 Selected line ->
                     if String.trimLeft line == line then
-                        ( Browse
-                            { graph = Knowledge.Graph.goto line graph
+                        ( { model
+                            | graph = Knowledge.Graph.goto line model.graph
                             , selected = Just line
-                            , lines = lines
-                            }
+                            , mode = Browse
+                          }
                         , Cmd.none
                         )
 
@@ -173,11 +178,9 @@ update msg model =
                         ( model, Cmd.none )
 
                 GraphMsg m ->
-                    ( Browse
-                        { graph = Knowledge.Graph.update m graph
-                        , selected = selected
-                        , lines = lines
-                        }
+                    ( { model
+                        | graph = Knowledge.Graph.update m model.graph
+                      }
                     , Cmd.none
                     )
 
