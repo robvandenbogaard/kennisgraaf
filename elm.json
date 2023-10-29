@@ -14,7 +14,8 @@
             "elm-community/graph": "6.0.0",
             "elm-community/typed-svg": "7.0.0",
             "folkertdev/one-true-path-experiment": "6.0.0",
-            "goyalarchit/elm-dagre": "3.0.0"
+            "goyalarchit/elm-dagre": "3.0.0",
+            "robvandenbogaard/elm-knowledge-graph": "1.0.0"
         },
         "indirect": {
             "avh4/elm-fifo": "1.0.4",

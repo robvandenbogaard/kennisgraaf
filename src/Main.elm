@@ -167,7 +167,7 @@ update msg model =
                 Selected line ->
                     if String.trimLeft line == line then
                         ( { model
-                            | graph = Knowledge.Graph.goto line model.graph
+                            | graph = Knowledge.Graph.select line model.graph
                             , selected = Just line
                             , mode = Browse
                           }
